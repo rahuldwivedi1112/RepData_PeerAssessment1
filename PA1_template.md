@@ -1,32 +1,44 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 
 ## Loading and preprocessing the data
-```{r}
+
+```r
 unzip('activity.zip')
 activity_data <- read.csv('activity.csv')
 ```
 ## What is mean total number of steps taken per day?
-```{r}
+
+```r
 total_steps<- aggregate(steps~date,activity_data,sum,rm.na = TRUE)
 hist(total_steps$steps,breaks = 40, xlab='Total steps per day',main = 'Histogram',col = 'Red' )
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
+
 ### Mean and Median of total number of steps taken per day
-```{r}
+
+```r
 mean_steps <- mean(total_steps$steps)
 median_steps <- median(total_steps$steps)
 mean_steps
+```
+
+```
+## [1] 10767.19
+```
+
+```r
 median_steps
 ```
 
+```
+## [1] 10766
+```
+
 ## What is the average daily activity pattern?
-```{r}
+
+```r
 interval <- aggregate(steps ~ interval, activity_data, mean,rm.na = TRUE)
 plot(
         x = interval$interval,
@@ -38,15 +50,29 @@ plot(
 )
 ```
 
-```{r}
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
+
+
+```r
 interval[interval$steps==max(interval$steps),]
 ```
 
+```
+##     interval    steps
+## 104      835 206.1698
+```
+
 ## Imputing missing values
-```{r}
+
+```r
 nrow(activity_data[is.na(activity_data$steps),])
 ```
-```{r}
+
+```
+## [1] 2304
+```
+
+```r
 names(interval)[2] <- "mean_steps"
 newactivity <- merge(activity_data, interval, by = 'interval')
 newactivity$steps[is.na(newactivity$steps)] <- as.integer(
@@ -61,23 +87,39 @@ hist(
         xlab = "(Total Number of Steps each day",
         breaks = 20
 )
+```
 
+![](PA1_template_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
+
+```r
 mean_steps <- mean(newtotal$steps)
 median_steps <- median(newtotal$steps)
 mean_steps
-median_steps
+```
 
+```
+## [1] 10765.64
+```
+
+```r
+median_steps
+```
+
+```
+## [1] 10762
 ```
 
 ## Are there differences in activity patterns between weekdays and weekends?
-```{r}
+
+```r
 weekend <- weekdays(as.Date(newactivity1$date)) %in% c("Saturday", "Sunday")
 newactivity1$daytype <- "weekday"
 newactivity1$daytype[weekend == TRUE] <- "weekend"
 newactivity1$daytype <- as.factor(newactivity1$daytype)
 ```
 
-```{r}
+
+```r
 newinterval <- aggregate(steps ~ interval + daytype, newactivity1, mean)
 library(lattice)
 xyplot(
@@ -90,3 +132,5 @@ xyplot(
         ylab = "Average Number of Steps Taken"
 )
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
